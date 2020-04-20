@@ -44,8 +44,8 @@ namespace Es.InkPainter.Sample
                     if (Physics.Raycast(ray, out hitInfo))
                     {
                         var paintObject = hitInfo.transform.GetComponent<InkCanvas>();
-                        hitInfo.point = new Vector3(hitInfo.point.x,hitInfo.point.y+1,hitInfo.point.z);
-                        brushobject.transform.position =new Vector3( hitInfo.point.x, hitInfo.point.y, hitInfo.point.z);
+                        hitInfo.point = new Vector3(hitInfo.point.x,hitInfo.point.y+0.6f,hitInfo.point.z);
+                        brushobject.transform.position = hitInfo.point;//new Vector3( hitInfo.point.x, hitInfo.point.y, hitInfo.point.z);
                         if (paintObject != null)
                             switch (useMethodType)
                             {

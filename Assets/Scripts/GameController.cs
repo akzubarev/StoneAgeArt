@@ -13,8 +13,12 @@ public class GameController : MonoBehaviour
     List<int> enemies = new List<int>();
     int currentenemyid = 0;
     int accuracy = 0;
-   int curenemypos=0;
-    int howmanyenemies=2;
+    int enemyaccuracy = 0;
+    int curenemypos = 0;
+    int howmanyenemies = 2;
+
+    System.Random rnd = new System.Random();
+
 
     void Start()
     {
@@ -25,10 +29,9 @@ public class GameController : MonoBehaviour
         enemieswindow.SetActive(false);
     }
 
-    System.Random rnd = new System.Random();
     public void FindOpponent()
     {
-        curenemypos= rnd.Next(0, enemies.Count);
+        curenemypos = rnd.Next(0, enemies.Count);
         currentenemyid = enemies[curenemypos];
         Fight();
     }
@@ -38,14 +41,14 @@ public class GameController : MonoBehaviour
         fightwindow.transform.GetChild(1).gameObject.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>($"Enemies/Enemy{currentenemyid}/Enemy");
         shape1.SetTexture("_MainTex", Resources.Load<Texture>($"Enemies/Enemy{currentenemyid}/Shape"));
         shape2.SetTexture("_MaskTex", Resources.Load<Texture>($"Enemies/Enemy{currentenemyid}/Shape"));
-        
+
         StartCoroutine(ShowFightWindow());
     }
 
-
     public void ChangeBrush(int num)
     {
-        switch(num){
+        switch (num)
+        {
             case 0:
                 camera.GetComponent<Es.InkPainter.Sample.MousePainter>().brush.BrushTexture = Resources.Load<Texture>($"Drawing/brush_mini");
                 break;
@@ -70,7 +73,7 @@ public class GameController : MonoBehaviour
             incomplete = stat.IncompletedPixelCount;
 
         //accuracy = (int)(100 * (float)goodpixels / (goodpixels + incomplete) - (float)badpixels / (goodpixels + incomplete + badpixels) / 3);
-        accuracy = (int)(100 * Mathf.Clamp01(goodpixels / (goodpixels + incomplete * 0.8f)) * Mathf.Clamp01(((2.4f * goodpixels) - badpixels) / (goodpixels + 1)));
+        accuracy = (int)(100 * Mathf.Clamp01(goodpixels / (goodpixels + incomplete * 0.8f)) * Mathf.Clamp01(((2.4f * goodpixels) - badpixels) / (goodpixels + 1f)));
 
         camera.GetComponent<Es.InkPainter.Sample.MousePainter>().isEnabled = false;
         drawingwindow.SetActive(false);
@@ -83,19 +86,20 @@ public class GameController : MonoBehaviour
 
         playercounter.GetComponent<Counter>().maxvalue = accuracy;
         if (accuracy >= 60)
-            enemycounter.GetComponent<Counter>().maxvalue = 60;
+            enemyaccuracy = 60;
         else if (accuracy >= 50)
-            enemycounter.GetComponent<Counter>().maxvalue = 50;
-       else if (accuracy >= 40)
-            enemycounter.GetComponent<Counter>().maxvalue = 40;
+            enemyaccuracy = 50;
+        else if (accuracy >= 40)
+            enemyaccuracy = 40;
         else
-            enemycounter.GetComponent<Counter>().maxvalue = 40;
+            enemyaccuracy = 40;
 
+        enemycounter.GetComponent<Counter>().maxvalue = enemyaccuracy;
         playercounter.GetComponent<Counter>().Activate();
         enemycounter.GetComponent<Counter>().Activate();
 
         comparisonwindow.transform.GetChild(2).gameObject.GetComponent<SpriteRenderer>().sprite =
-            Resources.Load<Sprite>($"Enemies/Enemy{currentenemyid}/Drawing{enemycounter.GetComponent<Counter>().maxvalue}");
+            Resources.Load<Sprite>($"Enemies/Enemy{currentenemyid}/Drawing{enemyaccuracy}");
 
         StartCoroutine(ShowResult());
     }
@@ -108,15 +112,16 @@ public class GameController : MonoBehaviour
         camera.GetComponent<Es.InkPainter.Sample.MousePainter>().Clear();
         paintsurface.SetActive(false);
         camera.GetComponent<Es.InkPainter.Sample.MousePainter>().isEnabled = true;
+        accuracy=0;
+        enemyaccuracy=0;
+        
         comparisonwindow.SetActive(false);
         enemieswindow.SetActive(true);
 
         enemies.RemoveAt(curenemypos);
-        if (enemies.Count==0)
+        if (enemies.Count == 0)
             for (int i = 0; i < howmanyenemies; i++)
                 enemies.Add(i);
-
-
     }
 
     public void StartMenuClose()
@@ -128,8 +133,8 @@ public class GameController : MonoBehaviour
     IEnumerator ShowResult()
     {
         close.SetActive(false);
-        yield return new WaitForSeconds(enemycounter.GetComponent<Counter>().maxvalue * 0.05f + 1);
-        if (enemycounter.GetComponent<Counter>().maxvalue <= playercounter.GetComponent<Counter>().maxvalue)
+        yield return new WaitForSeconds(enemyaccuracy * 0.05f + 1);
+        if (enemyaccuracy <= accuracy)
             close.GetComponentInChildren<Text>().text = "You won!";
         else
             close.GetComponentInChildren<Text>().text = "You lost!";
@@ -140,7 +145,7 @@ public class GameController : MonoBehaviour
     {
         enemieswindow.SetActive(false);
         fightwindow.SetActive(true);
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(1.5f);
         fightwindow.SetActive(false);
         drawingwindow.SetActive(true);
         paintsurface.SetActive(true);
