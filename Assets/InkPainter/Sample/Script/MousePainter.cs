@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 
 namespace Es.InkPainter.Sample
 {
@@ -15,7 +16,7 @@ namespace Es.InkPainter.Sample
             NearestSurfacePoint,
             DirectUV,
         }
-        public GameObject brushobject;
+        public GameObject brushobject, target, slider;
 
         [SerializeField]
         public Brush brush;
@@ -26,6 +27,8 @@ namespace Es.InkPainter.Sample
         [SerializeField]
         bool erase = false;
 
+        float timepressed = 0;
+        float timetopass = 1;
         public bool isEnabled = true;
 
         void Start()
@@ -44,32 +47,53 @@ namespace Es.InkPainter.Sample
                     if (Physics.Raycast(ray, out hitInfo))
                     {
                         var paintObject = hitInfo.transform.GetComponent<InkCanvas>();
-                        hitInfo.point = new Vector3(hitInfo.point.x,hitInfo.point.y+0.6f,hitInfo.point.z);
+                        hitInfo.point = new Vector3(hitInfo.point.x, hitInfo.point.y + 0.6f, hitInfo.point.z);
                         brushobject.transform.position = hitInfo.point;//new Vector3( hitInfo.point.x, hitInfo.point.y, hitInfo.point.z);
-                        if (paintObject != null)
-                            switch (useMethodType)
-                            {
-                                case UseMethodType.RaycastHitInfo:
-                                    success = erase ? paintObject.Erase(brush, hitInfo) : paintObject.Paint(brush, hitInfo);
-                                    break;
 
-                                case UseMethodType.WorldPoint:
-                                    success = erase ? paintObject.Erase(brush, hitInfo.point) : paintObject.Paint(brush, hitInfo.point);
-                                    break;
+                        if (timepressed < timetopass)
+                        {
+                            timepressed += Time.deltaTime;
+                            slider.GetComponent<Slider>().value = timepressed;
+                            target.SetActive(true);
+                            slider.SetActive(true);
+                        }
+                        else
+                        {
+                            target.SetActive(false);
+                            slider.SetActive(false);
+                            slider.GetComponent<Slider>().value = 0;
+                            if (paintObject != null)
+                                switch (useMethodType)
+                                {
+                                    case UseMethodType.RaycastHitInfo:
+                                        success = erase ? paintObject.Erase(brush, hitInfo) : paintObject.Paint(brush, hitInfo);
+                                        break;
 
-                                case UseMethodType.NearestSurfacePoint:
-                                    success = erase ? paintObject.EraseNearestTriangleSurface(brush, hitInfo.point) : paintObject.PaintNearestTriangleSurface(brush, hitInfo.point);
-                                    break;
+                                    case UseMethodType.WorldPoint:
+                                        success = erase ? paintObject.Erase(brush, hitInfo.point) : paintObject.Paint(brush, hitInfo.point);
+                                        break;
 
-                                case UseMethodType.DirectUV:
-                                    if (!(hitInfo.collider is MeshCollider))
-                                        Debug.LogWarning("Raycast may be unexpected if you do not use MeshCollider.");
-                                    success = erase ? paintObject.EraseUVDirect(brush, hitInfo.textureCoord) : paintObject.PaintUVDirect(brush, hitInfo.textureCoord);
-                                    break;
-                            }
-                        if (!success)
-                            Debug.LogError("Failed to paint.");
+                                    case UseMethodType.NearestSurfacePoint:
+                                        success = erase ? paintObject.EraseNearestTriangleSurface(brush, hitInfo.point) : paintObject.PaintNearestTriangleSurface(brush, hitInfo.point);
+                                        break;
+
+                                    case UseMethodType.DirectUV:
+                                        if (!(hitInfo.collider is MeshCollider))
+                                            Debug.LogWarning("Raycast may be unexpected if you do not use MeshCollider.");
+                                        success = erase ? paintObject.EraseUVDirect(brush, hitInfo.textureCoord) : paintObject.PaintUVDirect(brush, hitInfo.textureCoord);
+                                        break;
+                                }
+                            if (!success)
+                                Debug.LogError("Failed to paint.");
+                        }
                     }
+                }
+                else
+                {
+                    timepressed = 0;
+                    target.SetActive(false);
+                    slider.SetActive(false);
+                    slider.GetComponent<Slider>().value = 0;
                 }
         }
         /*

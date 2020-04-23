@@ -12,6 +12,7 @@ public class Counter : MonoBehaviour
     public void Activate()
     {
         count=0;
+        gameObject.GetComponent<Text>().text = count + "%";
         StartCoroutine(WaitAndPrint());
     }
 
@@ -24,7 +25,7 @@ public class Counter : MonoBehaviour
             if (count < maxvalue)
             {
                 count++;
-                this.gameObject.GetComponent<Text>().text = count + "%";
+                gameObject.GetComponent<Text>().text = count + "%";
             }
             else
                 break;
