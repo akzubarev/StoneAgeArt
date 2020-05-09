@@ -15,7 +15,7 @@ public class GameController : MonoBehaviour
     int accuracy = 0;
     int enemyaccuracy = 0;
     int curenemypos = 0;
-    int howmanyenemies = 2;
+    public int howmanyenemies = 2;
 
     System.Random rnd = new System.Random();
 
@@ -73,7 +73,7 @@ public class GameController : MonoBehaviour
             incomplete = stat.IncompletedPixelCount;
 
         //accuracy = (int)(100 * (float)goodpixels / (goodpixels + incomplete) - (float)badpixels / (goodpixels + incomplete + badpixels) / 3);
-        accuracy = (int)(100 * Mathf.Clamp01(goodpixels / (goodpixels + incomplete * 0.8f)) * Mathf.Clamp01(((2.4f * goodpixels) - badpixels) / (goodpixels + 1f)));
+        accuracy = (int)System.Math.Round(100 * Mathf.Clamp01(goodpixels / (goodpixels + incomplete * 0.8f)) * Mathf.Clamp01(((2.4f * goodpixels) - badpixels) / (goodpixels + 1f)));
 
         camera.GetComponent<Es.InkPainter.Sample.MousePainter>().isEnabled = false;
         drawingwindow.SetActive(false);
