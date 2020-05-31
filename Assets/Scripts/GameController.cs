@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class GameController : MonoBehaviour
 {
     public GameObject drawingwindow, comparisonwindow, playercounter, enemycounter, close,
-        fightwindow, enemieswindow, startingwindow, camera, paintsurface;
+        fightwindow, enemieswindow, camera, paintsurface;
 
     public Material shape1, shape2;
 
@@ -15,18 +15,15 @@ public class GameController : MonoBehaviour
     int accuracy = 0;
     int enemyaccuracy = 0;
     int curenemypos = 0;
-    public int howmanyenemies = 2;
+    public int howmanyenemies = 2, howmanycharacters=2;
 
     System.Random rnd = new System.Random();
 
 
     void Start()
     {
-        enemieswindow.SetActive(true);
         for (int i = 0; i < howmanyenemies; i++)
             enemies.Add(i);
-
-        enemieswindow.SetActive(false);
     }
 
     public void FindOpponent()
@@ -38,9 +35,10 @@ public class GameController : MonoBehaviour
 
     public void Fight()
     {
-        fightwindow.transform.GetChild(1).gameObject.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>($"Enemies/Enemy{currentenemyid}/Enemy");
-        shape1.SetTexture("_MainTex", Resources.Load<Texture>($"Enemies/Enemy{currentenemyid}/Shape"));
-        shape2.SetTexture("_MaskTex", Resources.Load<Texture>($"Enemies/Enemy{currentenemyid}/Shape"));
+        fightwindow.transform.GetChild(1).gameObject.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>($"Enemies/characters/{rnd.Next(howmanycharacters)}");
+       
+        shape1.SetTexture("_MainTex", Resources.Load<Texture>($"Enemies/shapes_t/{currentenemyid}"));
+        shape2.SetTexture("_MaskTex", Resources.Load<Texture>($"Enemies/shapes/{currentenemyid}"));
 
         StartCoroutine(ShowFightWindow());
     }
@@ -49,17 +47,25 @@ public class GameController : MonoBehaviour
     {
         switch (num)
         {
+            /*
             case 0:
                 camera.GetComponent<Es.InkPainter.Sample.MousePainter>().brush.BrushTexture = Resources.Load<Texture>($"Drawing/brush_mini");
                 break;
             case 1:
                 camera.GetComponent<Es.InkPainter.Sample.MousePainter>().brush.BrushTexture = Resources.Load<Texture>($"Drawing/black circle");
                 break;
-            case 2:
-                camera.GetComponent<Es.InkPainter.Sample.MousePainter>().brush.Color = Color.red;
+           */
+            case 0:
+                camera.GetComponent<Es.InkPainter.Sample.MousePainter>().brush.Color = Color.black;
+                GameObject.Find("Brush").GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>($"Drawing/Tools/U");
                 break;
-            case 3:
+            case 1:
                 camera.GetComponent<Es.InkPainter.Sample.MousePainter>().brush.Color = Color.white;
+                GameObject.Find("Brush").GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>($"Drawing/Tools/W");
+                break;
+            case 2:
+                camera.GetComponent<Es.InkPainter.Sample.MousePainter>().brush.Color = Color.blue;
+                GameObject.Find("Brush").GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>($"Drawing/Tools/B");
                 break;
 
         }
@@ -78,8 +84,8 @@ public class GameController : MonoBehaviour
         camera.GetComponent<Es.InkPainter.Sample.MousePainter>().isEnabled = false;
         drawingwindow.SetActive(false);
 
-        paintsurface.transform.localPosition += new Vector3(-100, 200, 0);
-        paintsurface.transform.localScale = new Vector3(300, 300, 1);
+        paintsurface.transform.localPosition += new Vector3(-100, 175, 0);
+        paintsurface.transform.localScale = new Vector3(200, 300, 1);
         paintsurface.transform.GetChild(0).gameObject.SetActive(false);
 
         comparisonwindow.SetActive(true);
@@ -106,8 +112,8 @@ public class GameController : MonoBehaviour
 
     public void Returntoenemies()
     {
-        paintsurface.transform.localPosition -= new Vector3(-100, 200, 0);
-        paintsurface.transform.localScale = new Vector3(600, 600, 1);
+        paintsurface.transform.localPosition -= new Vector3(-100, 175, 0);
+        paintsurface.transform.localScale = new Vector3(400, 600, 1);
         paintsurface.transform.GetChild(0).gameObject.SetActive(true);
         camera.GetComponent<Es.InkPainter.Sample.MousePainter>().Clear();
         paintsurface.SetActive(false);
@@ -122,12 +128,6 @@ public class GameController : MonoBehaviour
         if (enemies.Count == 0)
             for (int i = 0; i < howmanyenemies; i++)
                 enemies.Add(i);
-    }
-
-    public void StartMenuClose()
-    {
-        startingwindow.SetActive(false);
-        enemieswindow.SetActive(true);
     }
 
     IEnumerator ShowResult()
