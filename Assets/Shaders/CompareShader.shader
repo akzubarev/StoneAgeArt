@@ -4,6 +4,7 @@
     {
         _MainTex("Texture", 2D) = "white" {}
         _MaskTex("Texture", 2D) = "white" {}
+        _AlphaThreshold("Alpha Threshold", Range(0,1)) = 0.5
     }
         SubShader
         {
@@ -37,7 +38,9 @@
 
                 sampler2D _MaskTex;
                 float4 _MaskTex_ST;
-  
+
+                float _AlphaThreshold;
+
                 v2f vert(appdata v)
                 {
                     v2f o;
@@ -51,7 +54,7 @@
                     fixed4 colTex = tex2D(_MainTex, i.uv);
                     fixed d = length(colTex);
                     fixed4 colMask = tex2D(_MaskTex, i.uv);
-                    if (colMask.w > 0.5) {
+                    if (colMask.w > _AlphaThreshold) {
                         if (d > 0.1)
                             return fixed4(0, 1, 0, 1);
                         else
@@ -61,7 +64,7 @@
                         if (d > 0.1)
                             return fixed4(1, 0, 0, 1);
                     }
-                    
+
                     return fixed4(0, 0, 0, 0);
                 }
                 ENDCG
