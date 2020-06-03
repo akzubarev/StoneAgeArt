@@ -4,7 +4,7 @@
     {
         _MainTex("Texture", 2D) = "white" {}
         _MaskTex("Texture", 2D) = "white" {}
-        _AlphaThreshold("Alpha Threshold", Range(0,1)) = 0.5
+        _AlphaThreshold("Alpha Threshold", Range(0,1)) = 0.1
     }
         SubShader
         {
