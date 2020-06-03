@@ -15,7 +15,7 @@ public class GameController : MonoBehaviour
     int accuracy = 0;
     int enemyaccuracy = 0;
     int curenemypos = 0;
-    public int howmanyenemies = 2, howmanycharacters=2;
+    public int howmanyenemies = 2, howmanycharacters = 2;
 
     System.Random rnd = new System.Random();
 
@@ -42,7 +42,7 @@ public class GameController : MonoBehaviour
     public void Fight()
     {
         int currentenemycharacter = rnd.Next(howmanycharacters);
-        fightwindow.transform.GetChild(3).gameObject.GetComponent<SpriteRenderer>().sprite = 
+        fightwindow.transform.GetChild(3).gameObject.GetComponent<SpriteRenderer>().sprite =
             Resources.Load<Sprite>($"Enemies/characters/{currentenemycharacter}_right");
         comparisonwindow.transform.GetChild(4).gameObject.GetComponent<SpriteRenderer>().sprite =
                 Resources.Load<Sprite>($"Enemies/characters/{currentenemycharacter}_right");
@@ -50,7 +50,7 @@ public class GameController : MonoBehaviour
 
 
         shape1.SetTexture("_MainTex", Resources.Load<Texture>($"Enemies/shapes_t/{currentenemyid}"));
-        shape2.SetTexture("_MaskTex", Resources.Load<Texture>($"Enemies/shapes/{currentenemyid}"));
+        shape2.SetTexture("_MaskTex", Resources.Load<Texture>($"Enemies/shapes_t/{currentenemyid}"));
 
         StartCoroutine(ShowFightWindow());
     }
@@ -101,7 +101,6 @@ public class GameController : MonoBehaviour
 
         comparisonwindow.SetActive(true);
 
-        playercounter.GetComponent<Counter>().maxvalue = accuracy;
         if (accuracy >= 60)
             enemyaccuracy = 60;
         else if (accuracy >= 50)
@@ -111,7 +110,12 @@ public class GameController : MonoBehaviour
         else
             enemyaccuracy = 40;
 
+
+        playercounter.GetComponent<Counter>().maxvalue = accuracy;
+        playercounter.GetComponent<Counter>().middlevalue = System.Math.Min(accuracy, enemyaccuracy);
+
         enemycounter.GetComponent<Counter>().maxvalue = enemyaccuracy;
+        enemycounter.GetComponent<Counter>().middlevalue = System.Math.Min(accuracy, enemyaccuracy);
 
         StartCoroutine(ShowResult());
     }
@@ -127,9 +131,9 @@ public class GameController : MonoBehaviour
         camera.GetComponent<Es.InkPainter.Sample.MousePainter>().Clear();
         paintsurface.SetActive(false);
         camera.GetComponent<Es.InkPainter.Sample.MousePainter>().isEnabled = true;
-        accuracy=0;
-        enemyaccuracy=0;
-        
+        accuracy = 0;
+        enemyaccuracy = 0;
+
         comparisonwindow.SetActive(false);
         enemieswindow.SetActive(true);
         playercounter.SetActive(false);
@@ -147,8 +151,8 @@ public class GameController : MonoBehaviour
     IEnumerator ShowResult()
     {
         comparisonwindow.transform.GetChild(2).gameObject.GetComponent<SpriteRenderer>().sprite =
-                Resources.Load<Sprite>($"Enemies/Drawings/{currentenemyid}_{enemyaccuracy}");
-        
+                Resources.Load<Sprite>($"Enemies/results/{currentenemyid}");
+
         paintsurface.SetActive(false);
 
         yield return new WaitForSeconds(0.3f);
@@ -166,13 +170,16 @@ public class GameController : MonoBehaviour
 
         playercounter.GetComponent<Counter>().Activate();
         enemycounter.GetComponent<Counter>().Activate();
+    }
 
-        yield return new WaitForSeconds(enemyaccuracy * 0.05f + 1);
+    public void Showwinlose()
+    {
         if (enemyaccuracy <= accuracy)
             close.GetComponent<Image>().sprite = Resources.Load<Sprite>($"Buttons/win");
         else
             close.GetComponent<Image>().sprite = Resources.Load<Sprite>($"Buttons/lose");
         close.SetActive(true);
+
     }
 
     IEnumerator ShowFightWindow()
